@@ -42,21 +42,3 @@ Avtorizacija
 
 Baza podatkov
 – Sistem, kjer se shranjujejo podatki o receptih, uporabnikih, ocenah in komentarjih.
-
-UI (Uporabniški vmesnik)
-– Vizualna plast spletne strani, prek katere uporabnik upravlja z vsebino.
-
-Backend
-– Strežniški del aplikacije, ki obdeluje podatke, logiko, zahteve in se povezuje z bazo.
-
-Frontend
-– Del spletne aplikacije, ki ga vidi uporabnik (HTML, CSS, JS).
-
-DPU (Diagram poteka uporabe)
-– Diagram, ki prikazuje potek aktivnosti, interakcij in tok podatkov med uporabnikom in sistemom.
-
-API
-– Vmesnik za komunikacijo med frontend in backend delom aplikacije, še posebej pri dinamičnem nalaganju receptov.
-
-Seja (Session)
-– Podatki, ki se shranijo na strežniku/odjemalcu, da sistem ve, kateri uporabnik je prijavljen.
