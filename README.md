@@ -475,3 +475,134 @@ Izbriše recept.
 
 Projekt je namenjen učnim in razvojnim namenom.  
 Po potrebi dodajte datoteko `LICENSE` z izbrano licenco (npr. MIT, Apache 2.0).
+
+
+
+## Razredni diagram
+
+Spodaj je razredni diagram za backend dela aplikacije za recepte. Vključuje uporabnike, recepte, ocene, poslovno logiko (servise), dostop do podatkov (repositoryje) ter REST kontrolerje.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class User {
+        - Long id
+        - String username
+        - String email
+        - String passwordHash
+        - String displayName
+        + canEdit(recipe: Recipe): boolean
+    }
+
+    class Recipe {
+        - Long id
+        - String title
+        - String description
+        - String ingredients
+        - int prepTimeMinutes
+        - String instructions
+        - LocalDateTime createdAt
+        - LocalDateTime updatedAt
+        + updateDetails(title:String, description:String, ingredients:String, prepTimeMinutes:int, instructions:String): void
+        + getAverageRating(): double
+    }
+
+    class Rating {
+        - Long id
+        - int score
+        - String comment
+        - LocalDateTime createdAt
+    }
+
+    User "1" --> "*" Recipe : avtor
+    User "1" --> "*" Rating : poda
+    Recipe "1" *-- "*" Rating : ima   %% kompozicija (opcijsko, a lepo)
+
+    class UserService {
+        + register(username:String, email:String, password:String): User
+        + authenticate(username:String, password:String): User
+        + findById(id:Long): User
+    }
+
+    class RecipeService {
+        + createRecipe(authorId:Long, dto:Recipe): Recipe
+        + updateRecipe(recipeId:Long, dto:Recipe, userId:Long): Recipe
+        + deleteRecipe(recipeId:Long, userId:Long): void
+        + getRecipe(recipeId:Long): Recipe
+        + listRecipes(query:String, ingredient:String): List~Recipe~
+    }
+
+    class RatingService {
+        + addRating(recipeId:Long, userId:Long, score:int, comment:String): Rating
+        + getRatingsForRecipe(recipeId:Long): List~Rating~
+        + getAverageRating(recipeId:Long): double
+    }
+
+    UserService --> User
+    RecipeService --> Recipe
+    RatingService --> Rating
+
+    class JpaRepository {
+        <<interface>>
+    }
+
+    class UserRepository {
+        <<interface>>
+        + findByUsername(username:String): Optional~User~
+    }
+
+    class RecipeRepository {
+        <<interface>>
+        + findByTitleContainingIgnoreCase(title:String): List~Recipe~
+        + findByIngredientsContainingIgnoreCase(ingredient:String): List~Recipe~
+    }
+
+    class RatingRepository {
+        <<interface>>
+        + findByRecipeId(recipeId:Long): List~Rating~
+    }
+
+    JpaRepository <|-- UserRepository
+    JpaRepository <|-- RecipeRepository
+    JpaRepository <|-- RatingRepository
+
+    UserRepository --> User
+    RecipeRepository --> Recipe
+    RatingRepository --> Rating
+
+    UserService --> UserRepository
+    RecipeService --> RecipeRepository
+    RatingService --> RatingRepository
+
+    class AuthController {
+        + register(request)
+        + login(request)
+        + currentUser(): User
+    }
+
+    class RecipeController {
+        + getAll(q:String, ingredient:String): List~Recipe~
+        + getById(id:Long): Recipe
+        + create(recipe:Recipe): Recipe
+        + update(id:Long, recipe:Recipe): Recipe
+        + delete(id:Long): void
+    }
+
+    class RatingController {
+        + addRating(recipeId:Long, rating:Rating): Rating
+        + getRatings(recipeId:Long): List~Rating~
+    }
+
+    AuthController --> UserService
+    RecipeController --> RecipeService
+    RatingController --> RatingService
+
+    class FullstackBackendApplication {
+        + main(args:String[]): void
+    }
+
+    FullstackBackendApplication ..> AuthController
+    FullstackBackendApplication ..> RecipeController
+    FullstackBackendApplication ..> RatingController
+```
